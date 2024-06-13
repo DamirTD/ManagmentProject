@@ -2,38 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Models\User;
+use App\Enums\ErrorCodes;
+use App\Enums\HttpStatusCodes;
+use App\RepositoryInterfaces\UserRepositoryInterface;
+use App\Requests\LoginRequest;
+use App\Requests\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    protected AuthService $authService;
+    protected UserRepositoryInterface $userRepository;
+
+    public function __construct(AuthService $authService, UserRepositoryInterface $userRepository)
+    {
+        $this->authService    = $authService;
+        $this->userRepository = $userRepository;
+    }
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->only('name', 'email', 'password');
-        $data['password'] = bcrypt($data['password']);
+        $user = $this->userRepository->createUser($data);
 
-        $user = User::create($data);
-
-        return response()->json(['message' => 'User registered successfully', 'user' => $user]);
+        return response()->json([
+            'message' => 'User registered successfully',
+            'user' => $user
+        ], HttpStatusCodes::CREATED);
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
+        $credentials = $request->only('email', 'password');
+        $user = $this->authService->login($credentials);
+
+        if ($user) {
             return response()->json(['message' => 'Login successful', 'user' => $user]);
         } else {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Invalid credentials'], ErrorCodes::UNAUTHORIZED);
         }
     }
 
     public function logout(): JsonResponse
     {
-        Auth::logout();
+        $this->authService->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 }

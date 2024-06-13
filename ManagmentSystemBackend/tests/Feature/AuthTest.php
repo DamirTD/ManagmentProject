@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Constants\HttpStatusCodes;
+use App\Enums\HttpStatusCodes;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

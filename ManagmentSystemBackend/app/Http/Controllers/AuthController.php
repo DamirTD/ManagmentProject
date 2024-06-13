@@ -2,31 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Constants\ErrorCodes;
-use App\Constants\HttpStatusCodes;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Services\AuthService;
-use App\Models\User;
+use App\Enums\ErrorCodes;
+use App\Enums\HttpStatusCodes;
+use App\RepositoryInterfaces\UserRepositoryInterface;
+use App\Requests\LoginRequest;
+use App\Requests\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     protected AuthService $authService;
+    protected UserRepositoryInterface $userRepository;
 
-    public function __construct(AuthService $authService)
+    public function __construct(AuthService $authService, UserRepositoryInterface $userRepository)
     {
-        $this->authService = $authService;
+        $this->authService    = $authService;
+        $this->userRepository = $userRepository;
     }
 
     public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->only('name', 'email', 'password');
-        $user = $this->authService->register($data);
+        $user = $this->userRepository->createUser($data);
 
-        return response()->json(['message' => 'User registered successfully', 'user' => $user], HttpStatusCodes::CREATED);
+        return response()->json([
+            'message' => 'User registered successfully',
+            'user' => $user
+        ], HttpStatusCodes::CREATED);
     }
 
     public function login(LoginRequest $request): JsonResponse

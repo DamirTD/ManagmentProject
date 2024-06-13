@@ -1,0 +1,1 @@
+{"version":1,"defects":{"Tests\\Unit\\AuthTest::testRegisterUser":7,"Tests\\Feature\\AuthTest::testLoginUser":7,"Tests\\Feature\\AuthTest::testLogoutUser":7},"times":{"Tests\\Unit\\AuthTest::testRegisterUser":0.061,"Tests\\Feature\\AuthTest::testRegisterUser":0.06,"Tests\\Feature\\AuthTest::testLoginUser":0.023,"Tests\\Feature\\AuthTest::testLogoutUser":0.006}}

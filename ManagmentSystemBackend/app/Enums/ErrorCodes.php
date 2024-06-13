@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-enum ErrorCodes
+enum ErrorCodes: int
 {
-    public const UNAUTHORIZED = 401;
-    public const FORBIDDEN = 403;
-    public const NOT_FOUND = 404;
-    public const UNPROCESSABLE_ENTITY = 422;
-    public const INTERNAL_SERVER_ERROR = 500;
+    case UNAUTHORIZED = 401;
+    case FORBIDDEN = 403;
+    case NOT_FOUND = 404;
+    case UNPROCESSABLE_ENTITY = 422;
+    case INTERNAL_SERVER_ERROR = 500;
 }

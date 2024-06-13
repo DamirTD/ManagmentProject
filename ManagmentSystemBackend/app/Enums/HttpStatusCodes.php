@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-enum HttpStatusCodes
+enum HttpStatusCodes: int
 {
-    public const OK = 200;
-    public const CREATED = 201;
+    case OK = 200;
+    case CREATED = 201;
 }

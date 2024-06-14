@@ -19,7 +19,7 @@ class AuthTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(HttpStatusCodes::CREATED)
+        $response->assertStatus(HttpStatusCodes::CREATED->value)
             ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email']]);
 
         $this->assertDatabaseHas('users', [
@@ -39,7 +39,7 @@ class AuthTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(HttpStatusCodes::OK)
+        $response->assertStatus(HttpStatusCodes::OK->value)
             ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email']]);
     }
 
@@ -56,7 +56,7 @@ class AuthTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/logout');
 
-        $response->assertStatus(HttpStatusCodes::OK)
-            ->assertJson(['message' => 'Successfully logged out']);
+        $response->assertStatus(HttpStatusCodes::OK->value)
+            ->assertJson(['message' => 'Успешный выход']);
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Enums\HttpStatusCodes;
 
 class TaskTest extends TestCase
 {
@@ -19,7 +19,7 @@ class TaskTest extends TestCase
 
         $response = $this->getJson('/api/tasks');
 
-        $response->assertStatus(HttpStatusCodes::OK->value)
+        $response->assertStatus(Response::HTTP_OK)
             ->assertJsonCount(3);
     }
 
@@ -36,7 +36,7 @@ class TaskTest extends TestCase
 
         $response = $this->postJson('/api/tasks', $taskData);
 
-        $response->assertStatus(HttpStatusCodes::CREATED->value)
+        $response->assertStatus(Response::HTTP_CREATED)
             ->assertJsonFragment($taskData);
 
         $this->assertDatabaseHas('tasks', $taskData);
@@ -49,7 +49,7 @@ class TaskTest extends TestCase
 
         $response = $this->getJson("/api/tasks/{$task->id}");
 
-        $response->assertStatus(HttpStatusCodes::OK->value)
+        $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
                 'id' => $task->id,
                 'name' => $task->name,
@@ -72,7 +72,7 @@ class TaskTest extends TestCase
 
         $response = $this->putJson("/api/tasks/{$task->id}", $updatedData);
 
-        $response->assertStatus(HttpStatusCodes::OK->value)
+        $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment($updatedData);
 
         $this->assertDatabaseHas('tasks', $updatedData);
@@ -82,10 +82,9 @@ class TaskTest extends TestCase
     {
         $task = Task::factory()->create();
 
-        $response = $this->deleteJson("/api/tasks/{$task->id}");
+        $response = $this->deleteJson('/api/tasks/' . $task->id);
+        $response->assertNoContent();
 
-        $response->assertStatus(HttpStatusCodes::NO_CONTENT->value);
-
-        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+        $this->assertSoftDeleted('tasks', ['id' => $task->id]);
     }
 }

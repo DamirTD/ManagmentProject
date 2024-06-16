@@ -2,16 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\HttpStatusCodes;
+use App\Contracts\RepositoryInterfaces\TaskRepositoryInterface;
 use App\Models\Task;
 use App\Requests\Task\StoreTaskRequest;
 use App\Requests\Task\UpdateTaskRequest;
 use HttpStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller
 {
+    protected TaskRepositoryInterface $taskRepository;
+
+    public function __construct(TaskRepositoryInterface $taskRepository)
+    {
+        $this->taskRepository = $taskRepository;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/tasks",
@@ -26,8 +34,8 @@ class TaskController extends Controller
      */
     public function index(): JsonResponse
     {
-        $tasks = Task::with('user')->get();
-        return response()->json($tasks, HttpStatusCodes::OK->value);
+        $tasks = $this->taskRepository->getAllTasks();
+        return response()->json($tasks, Response::HTTP_OK);
     }
 
     /**
@@ -49,10 +57,8 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request): JsonResponse
     {
         $validated = $request->validated();
-
-        $task = Task::create($validated);
-
-        return response()->json($task, HttpStatusCodes::CREATED->value);
+        $task = $this->taskRepository->createTask($validated);
+        return response()->json($task, Response::HTTP_CREATED);
     }
 
     /**
@@ -76,8 +82,8 @@ class TaskController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $task = Task::with('user')->findOrFail($id);
-        return response()->json($task, HttpStatusCodes::OK->value);
+        $task = $this->taskRepository->getTaskById($id);
+        return response()->json($task, Response::HTTP_OK);
     }
 
     /**
@@ -105,13 +111,9 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, $id): JsonResponse
     {
-        $task = Task::findOrFail($id);
-
         $validated = $request->validated();
-
-        $task->update($validated);
-
-        return response()->json($task, HttpStatusCodes::OK->value);
+        $task = $this->taskRepository->updateTask($id, $validated);
+        return response()->json($task, Response::HTTP_OK);
     }
 
     /**
@@ -134,9 +136,7 @@ class TaskController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        $task = Task::findOrFail($id);
-        $task->delete();
-
-        return response()->json(null, HttpStatusCodes::NO_CONTENT->value);
+        $result = $this->taskRepository->destroy($id);
+        return response()->json(['message' => $result['message']], $result['status']);
     }
 }

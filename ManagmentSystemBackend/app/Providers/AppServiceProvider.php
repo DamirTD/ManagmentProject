@@ -2,7 +2,13 @@
 
 namespace App\Providers;
 
-use App\Services\AuthService;
+use App\Contracts\Repositories\UserRepository;
+use App\Contracts\Repositories\TaskRepository;
+use App\Contracts\RepositoryInterfaces\TaskRepositoryInterface;
+use App\Contracts\ServiceInterfaces\AuthServiceInterface;
+use App\Contracts\ServiceInterfaces\TaskServiceInterface;
+use App\Contracts\Services\AuthService;
+use App\Contracts\Services\TaskService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,9 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(AuthService::class, function ($app) {
-            return new AuthService();
-        });
+        $this->app->singleton(TaskServiceInterface::class, TaskService::class);
     }
 
     /**

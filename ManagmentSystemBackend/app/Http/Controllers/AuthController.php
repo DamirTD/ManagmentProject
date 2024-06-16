@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ErrorCodes;
-use App\Enums\HttpStatusCodes;
-use App\RepositoryInterfaces\UserRepositoryInterface;
-use App\Requests\LoginRequest;
-use App\Requests\RegisterRequest;
-use App\Services\AuthService;
+use App\Contracts\RepositoryInterfaces\TaskRepositoryInterface;
+use App\Contracts\Services\AuthService;
+use App\Requests\Auth\LoginRequest;
+use App\Requests\Auth\RegisterRequest;
 use Illuminate\Http\JsonResponse;
-use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @OA\Info(
@@ -28,9 +26,9 @@ use OpenApi\Annotations as OA;
 class AuthController extends Controller
 {
     protected AuthService $authService;
-    protected UserRepositoryInterface $userRepository;
+    protected TaskRepositoryInterface $userRepository;
 
-    public function __construct(AuthService $authService, UserRepositoryInterface $userRepository)
+    public function __construct(AuthService $authService, TaskRepositoryInterface $userRepository)
     {
         $this->authService = $authService;
         $this->userRepository = $userRepository;
@@ -86,13 +84,13 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $data = $request->only('name', 'email', 'password');
-        $user = $this->userRepository->createUser($data);
+        $data = $request->all();
+        $user = $this->authService->register($data);
 
         return response()->json([
             'message' => 'Пользователь успешно зарегистрирован',
             'user' => $user
-        ], HttpStatusCodes::CREATED);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -145,7 +143,7 @@ class AuthController extends Controller
         if ($user) {
             return response()->json(['message' => 'Успешный вход', 'user' => $user]);
         } else {
-            return response()->json(['message' => 'Неверные учетные данные'], ErrorCodes::UNAUTHORIZED);
+            return response()->json(['message' => 'Неверные учетные данные'], Response::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -167,6 +165,6 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
-        return response()->json(['message' => 'Успешный выход']);
+        return response()->json(['message' => 'Успешный выход'], Response::HTTP_OK);
     }
 }

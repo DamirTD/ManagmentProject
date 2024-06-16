@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Enums\HttpStatusCodes;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -19,7 +19,7 @@ class AuthTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(HttpStatusCodes::CREATED)
+        $response->assertStatus(Response::HTTP_CREATED)
             ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email']]);
 
         $this->assertDatabaseHas('users', [
@@ -39,7 +39,7 @@ class AuthTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(HttpStatusCodes::OK)
+        $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure(['message', 'user' => ['id', 'name', 'email']]);
     }
 
@@ -56,7 +56,7 @@ class AuthTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/logout');
 
-        $response->assertStatus(HttpStatusCodes::OK)
-            ->assertJson(['message' => 'Successfully logged out']);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson(['message' => 'Успешный выход']);
     }
 }

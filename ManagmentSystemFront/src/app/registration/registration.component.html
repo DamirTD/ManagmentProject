@@ -1,0 +1,36 @@
+<div class="registration-container">
+  <mat-card class="gender-card" *ngIf="!selectedGender" (click)="selectGender('male')">
+    <img ngSrc="assets/images/registration/male-icon.png" alt="Male Icon" height="500" width="500" priority>
+    <p>Male</p>
+  </mat-card>
+  <mat-card class="gender-card" *ngIf="!selectedGender" (click)="selectGender('female')">
+    <img ngSrc="assets/images/registration/female-icon.png" alt="Female Icon" height="500" width="500" priority>
+    <p>Female</p>
+  </mat-card>
+
+  <div class="input-container" *ngIf="selectedGender && !showContactInfo">
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" [(ngModel)]="age">
+
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName" [(ngModel)]="firstName">
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" [(ngModel)]="lastName">
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" [(ngModel)]="password">
+
+    <button mat-raised-button color="primary" (click)="nextStep()">Далее</button>
+  </div>
+
+  <div class="input-container" *ngIf="showContactInfo">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" [(ngModel)]="email">
+
+    <label for="phoneNumber">Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phoneNumber" [(ngModel)]="phoneNumber">
+
+    <button mat-raised-button color="accent" (click)="send()">Отправить</button>
+  </div>
+</div>

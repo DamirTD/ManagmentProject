@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\RepositoryInterfaces\TaskRepositoryInterface;
-use App\Models\Task;
 use App\Requests\Task\StoreTaskRequest;
 use App\Requests\Task\UpdateTaskRequest;
-use HttpStatus;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller

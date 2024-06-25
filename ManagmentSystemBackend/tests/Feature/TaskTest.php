@@ -27,10 +27,10 @@ class TaskTest extends TestCase
     {
         $user = User::factory()->create();
         $taskData = [
-            'name' => 'New Task',
+            'name'        => 'New Task',
             'description' => 'Task description',
-            'start_date' => now()->toDateString(),
-            'end_date' => now()->addDays(7)->toDateString(),
+            'start_date'  => now()->toDateString(),
+            'end_date'    => now()->addDays(7)->toDateString(),
             'assigned_to' => $user->id,
         ];
 
@@ -51,8 +51,8 @@ class TaskTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonFragment([
-                'id' => $task->id,
-                'name' => $task->name,
+                'id'          => $task->id,
+                'name'        => $task->name,
                 'description' => $task->description,
             ]);
     }
@@ -63,10 +63,10 @@ class TaskTest extends TestCase
         $task = Task::factory()->create(['assigned_to' => $user->id]);
 
         $updatedData = [
-            'name' => 'Updated Task',
+            'name'        => 'Updated Task',
             'description' => 'Updated description',
-            'start_date' => now()->toDateString(),
-            'end_date' => now()->addDays(10)->toDateString(),
+            'start_date'  => now()->toDateString(),
+            'end_date'    => now()->addDays(10)->toDateString(),
             'assigned_to' => $user->id,
         ];
 

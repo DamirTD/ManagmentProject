@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Repositories\UserRepository;
 use App\Contracts\RepositoryInterfaces\TaskRepositoryInterface;
+use App\Contracts\RepositoryInterfaces\UserRepositoryInterface;
 use App\Contracts\Services\AuthService;
+use App\Models\User;
 use App\Requests\Auth\LoginRequest;
 use App\Requests\Auth\RegisterRequest;
 use Illuminate\Http\JsonResponse;
@@ -26,9 +29,9 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthController extends Controller
 {
     protected AuthService $authService;
-    protected TaskRepositoryInterface $userRepository;
+    protected UserRepositoryInterface $userRepository;
 
-    public function __construct(AuthService $authService, TaskRepositoryInterface $userRepository)
+    public function __construct(AuthService $authService, UserRepositoryInterface $userRepository)
     {
         $this->authService = $authService;
         $this->userRepository = $userRepository;
@@ -44,10 +47,16 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(
-     *                 property="name",
+     *                 property="firstName",
      *                 type="string",
-     *                 example="Иван Иванов",
+     *                 example="Иван",
      *                 description="Имя пользователя"
+     *             ),
+     *             @OA\Property(
+     *                 property="lastName",
+     *                 type="string",
+     *                 example="Иванов",
+     *                 description="Фамилия пользователя"
      *             ),
      *             @OA\Property(
      *                 property="email",
@@ -56,10 +65,22 @@ class AuthController extends Controller
      *                 description="Электронная почта пользователя"
      *             ),
      *             @OA\Property(
-     *                 property="password",
+     *                 property="phoneNumber",
      *                 type="string",
-     *                 example="password123",
-     *                 description="Пароль пользователя"
+     *                 example="+1234567890",
+     *                 description="Номер телефона пользователя"
+     *             ),
+     *             @OA\Property(
+     *                 property="age",
+     *                 type="integer",
+     *                 example=25,
+     *                 description="Возраст пользователя"
+     *             ),
+     *             @OA\Property(
+     *                 property="gender",
+     *                 type="string",
+     *                 example="male",
+     *                 description="Пол пользователя"
      *             )
      *         )
      *     ),
@@ -84,13 +105,18 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $data = $request->all();
-        $user = $this->authService->register($data);
+        try {
+            $user = $this->authService->register($request->validated());
 
-        return response()->json([
-            'message' => 'Пользователь успешно зарегистрирован',
-            'user' => $user
-        ], Response::HTTP_CREATED);
+            return response()->json([
+                'message' => 'Пользователь успешно зарегистрирован',
+                'user' => $user,
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ошибка при регистрации пользователя: ' . $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
